@@ -11,7 +11,8 @@
   <link rel="stylesheet" type="text/css" href="./assets/css/reset.css">
   <!-- custom stylesheet -->
   <link rel="stylesheet" type="text/css" href="./assets/css/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
 
 </head>
 <body>
@@ -43,8 +44,11 @@
       <section id="rps-action" class="row content-area">
         <!-- player1 box -->
         <div id="player1" class="col-2 player-box">
-          <p id="player-instruct"></p>
-          <p id="player-score"></p>
+
+        <!-- ****RPS buttons go here**** -->
+          <p id="player1-instruct" class='instruct'>testing testing</p>
+          <p id="player1-score" class='score'>testing testing</p>
+
         </div>
 
         <!-- results box message -->
@@ -53,8 +57,8 @@
 
         <!-- player2 box -->
         <div id="player2" class="col-2 player-box">
-          <p id="player-instruct"></p>
-          <p id="player-score"></p>
+          <p id="player2-instruct" class='instruct'></p>
+          <p id="player2-score" class='score'></p>
         </div>
 
       </section>

@@ -1,0 +1,327 @@
+/* -----BODY DEFAULTS----- */
+
+html {
+  height: 100%;
+}
+
+body {
+  font-family: 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+  line-height: 2;
+  color: black;
+  background-image:url("../images/");
+  background-repeat:repeat;
+  min-height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin-left: -10px;
+  background-color: #E2F1CC;
+}
+
+/* -----ELEMENT CSS----- */
+
+h1 {
+  font-size: 2em;
+  text-align: center;
+  align-self: center;
+}
+
+header {
+  padding: 0;
+  margin: 0 0 10px 0;
+  width: 100%;
+  height: 50px;
+  background-color: #BDD7B4;
+}
+
+aside {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+/* -----BASIC FRAMEWORK CSS----- */
+
+.row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.row-vert {
+  flex-direction: column;
+  top: 0;
+  z-index: 2;
+  height: 100%;
+  width: 100%;
+}
+
+.freeze {
+  position: fixed;
+  width: inherit;
+  z-index: 3;
+  height: 25vh;
+}
+
+.col-vert {
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: inherit;
+}
+
+
+.right-align {
+  justify-content: flex-end;
+}
+
+.left-align {
+  justify-content: flex-start;
+}
+
+.split {
+  justify-content: space-between;
+}
+
+.col-6 {
+  width: 100%;
+  height: inherit;
+}
+
+.col-5 {
+  width: 83.3333%;
+}
+
+.col-4 {
+  width: 66.6666%;
+}
+
+.col-3 {
+  width: 50%;
+}
+
+.col-2 {
+  width: 33.3333%;
+}
+
+.col-1 {
+  width: 16.6666%;
+  justify-content: inherit;
+
+}
+
+.player-box {
+  display: flex;
+  justify-content: space-between;
+  height: 150px;
+  width: 150px;
+  border: solid 1px black;
+}
+
+.player-instruct {
+  align-self: flex-start;
+}
+
+.player-score {
+  align-self: flex-end;
+}
+
+.container-center{
+  margin: 5px auto 5px auto;
+  align-items: center;
+  align-self: center;
+  justify-content: center;
+}
+
+
+/* -----FIXED COMPONENTS----- */
+
+
+#app-board {
+  height: 100%;
+  padding: 0 10px 0 10px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+#login-box {
+  height: 30px;
+  background-color: white;
+  border: solid 1px black;
+  font-size: 1em;
+  width: 75%;
+  align-self: center;
+}
+
+#start-button {
+  height: 35px;
+  width: 20%;
+  background-color: white;
+  border: solid 1px black;
+  font-size: .8em;
+  align-self: center;
+
+}
+
+#game-feed {
+  justify-content: center;
+  align-self: center;
+  align-items: center;
+  height: 70px;
+}
+
+#rps-action {
+  justify-content: space-around;
+  margin-bottom: 100px;
+}
+
+#chat-window {
+  height: 150px;
+  overflow: scroll;
+  position: relative;
+  background-color: white;
+  border: none;
+}
+
+#chat-form {
+  height: 30px;
+  background-color: white;
+  border: solid 1px black;
+  width: 75%;
+}
+
+#send-button {
+  height: 35px;
+  width: 20%;
+  color: black;
+  font-size: .8em;
+  border: solid 1px black;
+  background-color: white;
+}
+
+/*
+#app-title {
+  z-index: 5;
+  overflow: hidden;
+  padding: 0;
+  background-color: black;
+  margin: 0;
+  width: 100%;
+  height: 25vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 5px 5px rgba(26, 26, 26, 0.42);
+}
+*/
+
+/*
+.overlay {
+  width: 100%;
+  height: inherit;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  z-index: 4;
+  background-color: green;
+  padding: 0;
+  margin: 0;
+  border: none;
+  overflow: hidden;
+}
+
+.overlay img{
+  width: 100%;
+  height: inherit;
+  object-fit: cover;
+  object-position: 50% 20%;
+  z-index: 4;
+  background-color: green;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+#title-box {
+  text-align: center;
+  color: white;
+  margin: 0;
+  position: absolute;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+  background-color: rgba(0,0,0,.5);
+  transform: translate(-50%,-50%);
+  border-radius: 5px;
+  font-size: 2em;
+}
+
+#title-box h1 {
+  font-size: 1.5em;
+}
+
+
+#title-box h5 {
+  font-size: .7em;
+}
+*/
+
+
+#sticky-footer {
+  color:#fff;
+  background-color:#894021;
+  background-size: cover;
+  border-top: 6px solid #4A2A09;
+  width: 100%;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: auto;
+  text-align: center;
+}
+
+#sticky-footer p {
+  text-align: center;
+  align-self: center;
+}
+/* --- dynamic content --- */
+
+
+
+/* --- responsive ------ */
+
+/*
+@media screen and (max-width: 414px) {
+
+  #title-box {
+    width:  100%;
+   }
+
+  #gif-display {
+    width: 100%;
+  }
+
+  form {
+    line-height: 1.5;
+  }
+
+}
+
+
+*/
+
+
+

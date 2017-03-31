@@ -1,0 +1,86 @@
+<!-- ****************************
+      Boilerplate HTML Page
+*********************************   -->
+
+<!doctype html>
+<html lang="en-us">
+<head>
+  <meta charset="UTF-8">
+  <title>RPS Multiplayer</title>
+  <!-- reset browser defaults -->
+  <link rel="stylesheet" type="text/css" href="./assets/css/reset.css">
+  <!-- custom stylesheet -->
+  <link rel="stylesheet" type="text/css" href="./assets/css/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+</head>
+<body>
+
+  <header>
+    <h1>Rock Paper Scissors</h1>
+  </header>
+
+  <!-- the main body wrapper: begin content -->
+  <main class="row app-board">
+    <!-- column wrapper for main body -->
+    <div class='col-6'>
+
+      <div class="row">
+        <div class='col-2 container-center'>
+          <!-- login box and start button for user to join game -->
+          <input id="login-box">
+          <input id="start-button" type="submit">
+        </div>
+      </div>
+      <!-- section for game play text messages to users -->
+      <div class="row">
+        <article id='game-feed' class="col-5 container-center">
+
+        </article>
+      </div>
+
+      <!-- player1 & player2 boxes plus results box for RPS -->
+      <section id="rps-action" class="row content-area">
+        <!-- player1 box -->
+        <div id="player1" class="col-2 player-box">
+          <p id="player-instruct"></p>
+          <p id="player-score"></p>
+        </div>
+
+        <!-- results box message -->
+        <div id="results" class="col-2 player-box">
+        </div>
+
+        <!-- player2 box -->
+        <div id="player2" class="col-2 player-box">
+          <p id="player-instruct"></p>
+          <p id="player-score"></p>
+        </div>
+
+      </section>
+
+      <!-- chat view window -->
+      <aside class="row">
+        <div id="chat-window" class="col-4">
+        </div>
+      </aside>
+      <!-- chat submit form & send button -->
+      <div class="row">
+        <div class='col-3 container-center'>
+          <input id="chat-form">
+          <input id="send-button" value="send" type="submit">
+        </div>
+      </div>
+
+    </div>
+        <!-- no more content past this piont -->
+  </main>
+
+<!-- footer  -->
+<footer id="sticky-footer">
+  <p>&copy;Copyright 2017 Daniel Russo</p>
+</footer>
+<script src="./assets/javascript/rps_game.js"></script>
+
+</body>
+</html>

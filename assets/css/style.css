@@ -175,9 +175,24 @@ section {
   box-shadow: 0 0 15px 7px yellow;
 }
 
-.cover-box {
-  position: absolute;
+.reg-box {
   z-index: 1;
+  display: block;
+  /*justify-content: space-between;*/
+  height: 150px;
+  width: 150px;
+  border: solid 1px black;
+  position: relative;
+}
+
+.cover-box {
+  display: block;
+  /*justify-content: space-between;*/
+  height: 150px;
+  width: 150px;
+  border: solid 1px black;
+  position: relative;
+  z-index: 20;
 }
 
 /* -----FIXED COMPONENTS----- */
@@ -244,6 +259,14 @@ section {
   font-size: .8em;
   border: solid 1px black;
   background-color: white;
+}
+
+#player1-pick,
+#player2-pick {
+  font-size: 2em;
+  color: black;
+  text-align: center;
+  align-self: center;
 }
 
 /*

@@ -30,7 +30,7 @@
   /*---- FLAGS ----*/
 
   // Is turn 1 or turn 2?
-  var theTurn = 0;
+  var theTurn = 1;
   // has a game started?
   var isGameStarted = false;
   // is this the beginning of a new round?
@@ -123,6 +123,7 @@ function initExistingPlayers(snap) {
         isaPlayer1 = true;
     } else {
         isaPlayer1 = false;
+        $('#player1-instruct').html("Waiting For Player 1");
       }
 
     // if player 2 exists - assign its properties to the client side p2 object
@@ -144,6 +145,7 @@ function initExistingPlayers(snap) {
         isaPlayer2 = true;
     } else {
         isaPlayer2 = false;
+        $('#player2-instruct').html("Waiting For Player 2");
       }
     // what turn is it
     /*if ( snap.child('turn/').exists() ) {
@@ -245,15 +247,12 @@ function initClientPlayer(clientName){
       p2.losses = 0;
       // flag the client player number
       clientPlayerNum = 2;
-      /*fanoutObject['/players/2/'] = p2;
-      fanoutObject['/'] = updatedTurn;
-      database.ref().update(fanoutObject);*/
       database.ref('/players/2/').update(p2);
       console.log('client assigned to player 2');
     }
 
   // update client player score
-  updateScoresDisplay(clientPlayerNum,0,0);
+  updateScoresDisplay(clientPlayerNum,0,0,clientName);
   // remove the login box and start button
   console.log('removing the start button and login box');
   $('#login-container').find('#login-box').remove();
@@ -261,8 +260,7 @@ function initClientPlayer(clientName){
   loginPrepped = false;
   console.log('establishing ondisconnect kill player');
   dropPlayerOnDisconnect();
-  // ********** this db update might be messing things up
-  //database.ref().update({turn : 1});
+  theTurn = 1;
 }
 
 // find out if there's an open spot and create login box for client
@@ -304,6 +302,8 @@ function getName(event) {
     var name = $('#login-box').val().trim();
     // empty the login box
     console.log("just entered username: "+name);
+    // reset to turn 1 because new player is entering
+    database.ref().update({turn : 1});
     return name;
   } else {
       return "";
@@ -321,9 +321,10 @@ function drawGlowBoxfunc(playerFlag) {
 
 // update the scoreboard for a player
 // pass in the player number, player wins, and player losses
-function updateScoresDisplay(whichPlayer,wins,losses) {
+function updateScoresDisplay(whichPlayer,wins,losses,pName) {
   console.log('updating player '+whichPlayer+' score.');
   $('#player'+whichPlayer+'-score').html('wins: '+wins+' losses: '+losses);
+  $('#player'+whichPlayer+'-instruct').html(pName);
 }
 
 // build the rock paper scissors choice buttons and put them in an array
@@ -350,6 +351,10 @@ function drawRPSfunc(playerFlag) {
     $('#player'+playerFlag).append(buttonS);
 }
 
+ function removeRPS(playerFlag) {
+    $('#player'+playerFlag).find('.rps-button').remove();
+ }
+
 
 // retrieve the player's choice
 function getChoice(event) {
@@ -358,6 +363,8 @@ function getChoice(event) {
   var target = $(event.target);
   var choice = target.text();
   console.log("just picked: "+choice);
+  removeRPS(theTurn);
+  theTurn++;
   return choice;
 }
 
@@ -430,6 +437,59 @@ function RPSengine () {
   // draws login box & start button if needed
   gameInit();
 
+  // if have 2 players start the game
+  if (isGameStarted) {
+    //if (clientIsPlayer) {
+      drawGlowBoxfunc(1);
+      drawRPSfunc(1);
+      // if it's not the client's turn, make the boxes unclickable
+      if ((clientPlayerNum != theTurn) || (clientIsPlayer === false)){
+        $('#'+theTurn+'box').removeClass('reg-box');
+        $('#'+theTurn+'box').addClass('cover-box');
+      } else {
+        $('#'+theTurn+'box').removeClass('cover-box');
+        $('#'+theTurn+'box').addClass('reg-box');
+      }
+      $('#rps-action').off().on("click",'.rps-button',function (event) {
+        // gets choice and removes buttons
+        var playerChoice = getChoice(event);
+        console.log('player'+theTurn+' chose '+playerChoice);
+        if (theTurn === 1) {
+          theTurn++;
+        } else {
+            theTurn--;
+          }
+        database.ref().update({turn: theTurn});
+      });
+      var theTurnRef = database.ref('turn/');
+
+      // update the RPS boxes everytime the turn changes in the DB
+      theTurnRef.on('value',function(spapple){
+        // if it's not the client's turn, make the boxes unclickable
+        theTurn = snapple.val();
+        if ((clientPlayerNum != theTurn) || (clientIsPlayer === false)){
+          $('#'+theTurn+'box').removeClass('reg-box');
+          $('#'+theTurn+'box').addClass('cover-box');
+        } else {
+          $('#'+theTurn+'box').removeClass('cover-box');
+          $('#'+theTurn+'box').addClass('reg-box');
+        }
+        drawGlowBoxfunc(theTurn);
+        drawRPSfunc(theTurn);
+      });
+ //   } else
+ //     {
+        if (clientIsPlayer === false) {
+          database.ref().on('value',function(snapshot){
+            dataPull = snapshot.val();
+            $('#player1-pick').html(dataPull[1].choice);
+            $('#player2-pick').html(dataPull[2].choice);
+        });
+      }
+    }
+  }
+
+
   // start value listeners
 /*
   database.ref().on("value",function(snapshot){
@@ -439,7 +499,7 @@ function RPSengine () {
   });
 */
 
-}
+
 
 
 RPSengine();

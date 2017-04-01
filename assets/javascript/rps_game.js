@@ -39,6 +39,8 @@
   var isTwoPlayers = false;
   // is the client a spectator - does not get to interact
   var isSpectator = true;
+  // are the login buttons drawn?
+  var loginPrepped = false;
   // is there a player1
   var isaPlayer1 = false;
   // is there a player 2
@@ -107,7 +109,9 @@ function initExistingPlayers(snap) {
         console.log("p1 is now -->");
         console.log(p1);
         isaPlayer1 = true;
-    }
+    } else {
+        isaPlayer1 = false;
+      }
 
     // if player 2 exists - assign its properties to the client side p2 object
     if ( snap.child('players/2').exists() ) {
@@ -119,7 +123,9 @@ function initExistingPlayers(snap) {
         console.log("p2 is now --> ");
         console.log(p2);
         isaPlayer2 = true;
-    }
+    } else {
+        isaPlayer2 = false;
+      }
     // what turn is it
     if ( snap.child('turn/').exists() ) {
         theTurn = snap.child('turn/').val();
@@ -134,31 +140,31 @@ function setGameFlags() {
   // the game has 2 players and is full
   if ((isaPlayer1) && (isaPlayer2)) {
     console.log("the game is full, removing start button and login box");
-    isSpectator = true;
+    //isSpectator = true;
     isTwoPlayers = true;
-    clientPlayerNum = 0;
-    clientIsPlayer = false;
+    //clientPlayerNum = 0;
+    //clientIsPlayer = false;
     isGameStarted = true;
     // get rid of the buttons so client can't login
     $('#login-container').find('#login-box').remove();
     $('#login-container').find('#start-button').remove();
-  } // the game isn't full but has a player 1 (ie player 2 must be empty)
-    else if (isaPlayer1) {
-      console.log("game isn't full but player 1 is taken");
+    loginPrepped = false;
+  } else if (isaPlayer1) {
+      console.log("player 1 is taken, player 2 is open");
       isTwoPlayers = false;
-      isaPlayer2 = false;
-    }  // the game isn't full and doesn't have a player 1
-      //  but player 2 could also be empty
-      else {
-        console.log("game isn't full, player 1 is open");
+      //isaPlayer2 = false;
+      isGameStarted = false;
+    } else if (isaPlayer2) {
+        console.log("player 2 is taken, player 1 is open");
         isTwoPlayers = false;
-        isaPlayer1 = false;
-        // check to see if game has zero players
-        if (isaPlayer2 === false) {
+        isGameStarted = false;
+      } else {
           console.log("there are no players in the game");
           noPlayers = true;
-        }
-      } // end check if game has zero players
+          isTwoPlayers = false;
+         // isaPlayer1 = false;
+          isGameStarted = false;
+        } // end check if game has zero players
 }
 
 // draw the start button and login box
@@ -171,16 +177,15 @@ function drawStartButton() {
   newStart.attr('id','start-button');
   $('#login-container').append(newBox);
   $('#login-container').append(newStart);
+  loginPrepped = true;
 }
 
 // assign the client to a player and initialize
 function initClientPlayer(clientName){
   console.log('assigning client to a player');
-  // turn off the click listener
   isSpectator = false;
   clientIsPlayer = true;
 
-  database.ref().update({turn : 1});
   // assign client to a player
   // zero players or player 2 is already taken
   if ((noPlayers) || (isaPlayer2)) {
@@ -209,8 +214,10 @@ function initClientPlayer(clientName){
   console.log('removing the start button and login box');
   $('#login-container').find('#login-box').remove();
   $('#login-container').find('#start-button').remove();
+  loginPrepped = false;
   console.log('establishing ondisconnect kill player');
   dropPlayerOnDisconnect();
+  //database.ref().update({turn : 1});
 }
 
 // find out if there's an open spot and create login box for client
@@ -218,11 +225,14 @@ function initClientPlayer(clientName){
 function clientOkToJoin() {
     console.log("giving client opportunity to log in");
     // create the start button
-    drawStartButton();
+    if (loginPrepped === false){
+      drawStartButton();
+    }
 
     // start event listener for start button
     $('#login-container').on('click','#start-button',function(event){
       event.preventDefault();
+      event.stopPropagation();
       console.log('start button was clicked');
       // get the name from the box
       var clientName = getName(event);
@@ -237,6 +247,7 @@ function clientOkToJoin() {
           $('#login-box').css({"background-color":"#FD7B94"});
           $('#login-box').val("must enter a name");
       }
+      $('#login-box').val("");
 
     }); // end of start button listener
 }
@@ -246,7 +257,6 @@ function getName(event) {
   console.log('retrieving login name');
   var name = $('#login-box').val().trim();
   // empty the login box
-  $('#login-box').val("");
   console.log("just entered username: "+name);
   return name;
 }
@@ -333,19 +343,21 @@ function getChatMessage(){
 // initialize the variables to match the game state in the DB
 function gameInit() {
   console.log("gameInit started");
-  listenForConnection();
+  //listenForConnection();
   var ref = database.ref();
   // check DB one time
-  ref.once('value')
-    .then(function(snapshot){
-      console.log("initial checking db one time");
+  /*ref.once('value')
+    .then(function(snapshot){ */
+    ref.on('value',function(snapshot){
+      /* console.log("initial checking db one time"); */
+      console.log('a db value has changed');
       // initialize local copies of exiting players in the DB
       // flag isaPlayer variables for existing players
       initExistingPlayers(snapshot);
       // set flags to control game play and login
       setGameFlags();
       // check if there's an open spot
-      if (isTwoPlayers === false) {
+      if ((isTwoPlayers === false) && (clientIsPlayer === false)) {
         // give the client option to log in
         clientOkToJoin();
       }

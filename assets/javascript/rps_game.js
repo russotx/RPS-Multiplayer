@@ -54,6 +54,9 @@
   // which player is the opponent
   var otherPlayerNum = 0;
 
+  // testing for initial auto read of db on page load
+  var initialRead = true;
+
   // the first player object
   var p1 = {
     "id"     : 1,
@@ -100,12 +103,21 @@ function initExistingPlayers(snap) {
     console.log("initializing existing players");
     // if player 1 exists - assign its properties to the client side
     // p1 object
-    if ( snap.child('players/1').exists() ) {
+    if (snap != null) {
+
+    //if ( snap.child('players/1').exists() ) {
+      if (snap[1] != null) {
         console.log('player 1 exists');
+        p1.name = snap[1].name;
+        p1.wins = snap[1].wins;
+        p1.losses = snap[1].losses;
+        noPlayers = false;
+      //  p1.choice = snap[1].choice;
+        /*
         p1.name = snap.child('players/1/name').val();
         p1.wins = snap.child('players/1/wins').val();
         p1.losses = snap.child('players/1/losses').val();
-        p1.choice = snap.child('players/1/choice').val();
+        p1.choice = snap.child('players/1/choice').val();*/
         console.log("p1 is now -->");
         console.log(p1);
         isaPlayer1 = true;
@@ -114,12 +126,19 @@ function initExistingPlayers(snap) {
       }
 
     // if player 2 exists - assign its properties to the client side p2 object
-    if ( snap.child('players/2').exists() ) {
+    //if ( snap.child('players/2').exists() ) {
+      if (snap[2] !=null) {
         console.log("player 2 exists");
+        p2.name = snap[2].name;
+        p2.wins = snap[2].wins;
+        p2.losses = snap[2].losses;
+        noPlayers = false;
+      //  p2.choice = snap[2].choice;
+        /*
         p2.name = snap.child('players/2/name').val();
         p2.wins = snap.child('players/2/wins').val();
         p2.losses = snap.child('players/2/losses').val();
-        p2.choice = snap.child('players/2/choice').val();
+        p2.choice = snap.child('players/2/choice').val();*/
         console.log("p2 is now --> ");
         console.log(p2);
         isaPlayer2 = true;
@@ -127,11 +146,15 @@ function initExistingPlayers(snap) {
         isaPlayer2 = false;
       }
     // what turn is it
-    if ( snap.child('turn/').exists() ) {
+    /*if ( snap.child('turn/').exists() ) {
         theTurn = snap.child('turn/').val();
         console.log('the turn on init -->');
         console.log(snap.child('turn/').val())
-    }
+    }*/
+  }
+
+       // set flags to control game play and login
+      setGameFlags();
 }
 
 // set flags to control game play and login
@@ -165,6 +188,13 @@ function setGameFlags() {
          // isaPlayer1 = false;
           isGameStarted = false;
         } // end check if game has zero players
+
+
+  // check if there's an open spot
+      if ((isTwoPlayers === false) && (clientIsPlayer === false)) {
+        // give the client option to log in
+        clientOkToJoin();
+      }
 }
 
 // draw the start button and login box
@@ -185,6 +215,12 @@ function initClientPlayer(clientName){
   console.log('assigning client to a player');
   isSpectator = false;
   clientIsPlayer = true;
+  console.log('inside initCLientPlayer, test isaPlayers.. p1= '+isaPlayer1+' ... p2= '+isaPlayer2);
+  // testing to see if fanout can stop multiple value events from messing
+  // shit up
+  /*var updatedTurn = {turn : 1};
+  var fanoutObject = {};*/
+  // --- continued in conditional statement ----
 
   // assign client to a player
   // zero players or player 2 is already taken
@@ -195,6 +231,11 @@ function initClientPlayer(clientName){
     p1.losses = 0;
     // flag the client player number
     clientPlayerNum = 1;
+    console.log('locally assigned client to player '+clientPlayerNum);
+    /*fanoutObject['/players/1/'] = p1;
+    fanoutObject['/turn/'] = updatedTurn;
+    database.ref().update(fanoutObject);*/
+    console.log('about to fire db update at players for client login');
     database.ref('/players/1/').update(p1);
     console.log('client assigned to player 1');
   } else  // only remaining option is client be player 2
@@ -204,6 +245,9 @@ function initClientPlayer(clientName){
       p2.losses = 0;
       // flag the client player number
       clientPlayerNum = 2;
+      /*fanoutObject['/players/2/'] = p2;
+      fanoutObject['/'] = updatedTurn;
+      database.ref().update(fanoutObject);*/
       database.ref('/players/2/').update(p2);
       console.log('client assigned to player 2');
     }
@@ -217,6 +261,7 @@ function initClientPlayer(clientName){
   loginPrepped = false;
   console.log('establishing ondisconnect kill player');
   dropPlayerOnDisconnect();
+  // ********** this db update might be messing things up
   //database.ref().update({turn : 1});
 }
 
@@ -230,9 +275,9 @@ function clientOkToJoin() {
     }
 
     // start event listener for start button
-    $('#login-container').on('click','#start-button',function(event){
+    $('#login-container').off().on('click','#start-button',function(event){
       event.preventDefault();
-      event.stopPropagation();
+    //  event.stopPropagation();
       console.log('start button was clicked');
       // get the name from the box
       var clientName = getName(event);
@@ -255,10 +300,15 @@ function clientOkToJoin() {
 // retrieve the login name
 function getName(event) {
   console.log('retrieving login name');
-  var name = $('#login-box').val().trim();
-  // empty the login box
-  console.log("just entered username: "+name);
-  return name;
+  if ($('#login-box').val() != undefined) {
+    var name = $('#login-box').val().trim();
+    // empty the login box
+    console.log("just entered username: "+name);
+    return name;
+  } else {
+      return "";
+  }
+
 }
 
 // build the glowing border around active player box
@@ -272,7 +322,7 @@ function drawGlowBoxfunc(playerFlag) {
 // update the scoreboard for a player
 // pass in the player number, player wins, and player losses
 function updateScoresDisplay(whichPlayer,wins,losses) {
-  console.log('updating a player'+whichPlayer+' score.');
+  console.log('updating player '+whichPlayer+' score.');
   $('#player'+whichPlayer+'-score').html('wins: '+wins+' losses: '+losses);
 }
 
@@ -343,24 +393,31 @@ function getChatMessage(){
 // initialize the variables to match the game state in the DB
 function gameInit() {
   console.log("gameInit started");
+  var playersref = database.ref('players/');
   //listenForConnection();
   var ref = database.ref();
   // check DB one time
   /*ref.once('value')
     .then(function(snapshot){ */
-    ref.on('value',function(snapshot){
+    playersref.on('value',function(snapshot){
       /* console.log("initial checking db one time"); */
-      console.log('a db value has changed');
-      // initialize local copies of exiting players in the DB
-      // flag isaPlayer variables for existing players
-      initExistingPlayers(snapshot);
-      // set flags to control game play and login
-      setGameFlags();
-      // check if there's an open spot
-      if ((isTwoPlayers === false) && (clientIsPlayer === false)) {
-        // give the client option to log in
-        clientOkToJoin();
-      }
+      if (initialRead) {
+        console.log("auto loading the db snapshot for first read");
+      } else{
+          console.log('a db value has changed at players/');
+        }
+        initialRead = false;
+      /*playersref.on('value')
+        .then(function(snap){*/
+          console.log("grabbed snapshot of the db");
+          // initialize local copies of exiting players in the DB
+          // flag isaPlayer variables for existing players
+          var changedPlayersData = snapshot.val();
+          console.log(changedPlayersData);
+          initExistingPlayers(changedPlayersData);
+        //});
+
+
     });
 
 }

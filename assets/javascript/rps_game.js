@@ -180,6 +180,7 @@ function initClientPlayer(clientName){
   isSpectator = false;
   clientIsPlayer = true;
 
+  database.ref().update({turn : 1});
   // assign client to a player
   // zero players or player 2 is already taken
   if ((noPlayers) || (isaPlayer2)) {
@@ -198,6 +199,7 @@ function initClientPlayer(clientName){
       p2.losses = 0;
       // flag the client player number
       clientPlayerNum = 2;
+      database.ref('/players/2/').update(p2);
       console.log('client assigned to player 2');
     }
 

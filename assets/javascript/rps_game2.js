@@ -296,7 +296,6 @@
         }); //----- end DOM update
       }
 
-
       // playerNum is the client's status in the game
       // player 1, player 2, or player 0:spectator
       function updateDOM(key,value,playerNum=0) {
@@ -307,8 +306,11 @@
             $('#player1-instruct').html(value);
             // remove the login boxes if the client is a player
             // if name just updated, client could have been the
-            // one that entered a name
+            // one that entered a name.
+            // and add the chat box for the player
             if (playerNum != 0) {
+              drawChatButton();
+              $('#game-feed').html('<p>Hi '+value+'! You are Player '+playerNum+'</p>');
               $('#login-container').find('#login-box').remove();
               $('#login-container').find('#start-button').remove();
             }
@@ -319,15 +321,14 @@
             // remove the login boxes if the client is a player
             // if name just updated, client could have been the
             // one that entered a name
+            // and add teh chat box for the player
             if (playerNum != 0) {
+              drawChatButton();
+              $('#game-feed').html('<p>Hi '+value+'! You are Player '+playerNum+'</p>');
               $('#login-container').find('#login-box').remove();
               $('#login-container').find('#start-button').remove();
             }
            break;
-         /* case ("winner") :
-            //update winner message
-            $('#results').html(value);
-            break; */
           case ("chat") :
             //add chat message
             $('#chat-window').append('<p>'+value+'</p>');
@@ -376,9 +377,8 @@
         }
       }
 
-      function compareChoicesFunc(){
-        database.ref().once('value')
-          .then(function(snapshot){
+      function compareChoicesFunc() {
+        database.ref().once('value').then(function(snapshot) {
             var theDB = snapshot.val();
             var name1 = theDB.allClients.p1Name;
             var name2 = theDB.allClients.p2Name;
@@ -438,13 +438,14 @@
                            fanoutObject2['/allClients/turn/'] = 1;
                            console.log("updating the DB turn after compare");
                            database.ref().update(fanoutObject2);
-                         }
-                         , 6000);
-          });
+                         }, 4000);
+              // end of setTimeout
+          }); // end of then function
       }
 
       function newTurnDOMops(key,turnNum,playerNum) {
         console.log("the turn has changed in the DB");
+        $('#game-feed').find('.instruction').remove();
         switch (turnNum) {
           // turn is 3 when two players haven't joined or someone drops
           case (3) :
@@ -455,11 +456,20 @@
             removeGlowBox();
             $('#results').html("");
             $('#game-feed').html("");
-            //$('#chat-form-container').html("");
+            $('#chat-window').html("");
+            // only remove the chat button if the client isn't a player
+            if (clientPlayerNum === 0) {
+              removeChatButton();
+              //remove the game feed too
+              $('#game-feed').html("");
+            }
             //$('#chat-form-container').find('#chat-form').remove();
             //$('#chat-form-container').find('#send-button').remove();
             console.log('newTurnDOMops case 3');
-            drawStartButton();
+            // only draw the start button if the client isn't a player
+            if (clientPlayerNum === 0){
+              drawStartButton();
+            }
           break;
           case(1) :
             if (clientPlayerNum === 0) {
@@ -509,6 +519,21 @@
         $('#login-container').html(newBox);
         $('#login-container').append(newStart);
         loginPrepped = true;
+      }
+
+      function drawChatButton() {
+        var newBox = $('<input>');
+        newBox.attr('id','chat-form');
+        var newSend = $('<input>');
+        newSend.attr('id','send-button');
+        newSend.attr('value','send');
+        newSend.attr('type','submit');
+        $('#chat-form-container').html(newBox);
+        $('#chat-form-container').append(newSend);
+      }
+
+      function removeChatButton() {
+        $('#chat-form-container').find('input').remove();
       }
 
       // build the glowing border around active player box
@@ -586,6 +611,7 @@
             // button bcz buttons overlap additional html that must remain
             removeRPS(clientPlayerNum);
             drawRPSfunc(clientPlayerNum);
+            $('#game-feed').append('<p class="instruction">It\'s Your Turn!</p>');
             break;
           default :
           // if it's not the client's turn, the client isn't logged in,

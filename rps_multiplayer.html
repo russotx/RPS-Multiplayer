@@ -28,9 +28,9 @@
 
       <div class="row">
         <div id='login-container' class='col-2 container-center'>
-          <!-- login box and start button for user to join game
+          <!-- login box and start button for user to join game -->
           <input id="login-box">
-          <input id="start-button" type="submit"> -->
+          <input id="start-button" type="submit">
         </div>
       </div>
       <!-- section for game play text messages to users -->
@@ -43,28 +43,24 @@
       <!-- player1 & player2 boxes plus results box for RPS -->
       <section id="rps-action" class="row content-area">
         <!-- player1 box -->
-        <div id='1box'>
           <div id="player1" class="col-2 player-box">
 
           <!-- ****RPS buttons go here**** -->
             <p id="player1-instruct" class='instruct'>Waiting For Player 1</p>
             <h4 id='player1-pick'></h4>
-            <p id="player1-score" class='score'></p>
+            <p id="player1-score" class='score'>Wins: 0 <span id="player1-losses">Losses: 0</span></p>
 
           </div>
-        </div>
         <!-- results box message -->
         <div id="results" class="col-2 player-box">
         </div>
 
         <!-- player2 box -->
-        <div id='2box'>
           <div id="player2" class="col-2 player-box">
             <p id="player2-instruct" class='instruct'>Waiting For Player 2</p>
             <h4 id='player2-pick'></h4>
-            <p id="player2-score" class='score'></p>
+            <p id="player2-score" class='score'>Wins: 0 <span id="player2-losses">Losses: 0</span></p>
           </div>
-        </div>
 
       </section>
 
@@ -75,7 +71,7 @@
       </aside>
       <!-- chat submit form & send button -->
       <div class="row">
-        <div class='col-3 container-center'>
+        <div id='chat-form-container' class='col-3 container-center'>
           <input id="chat-form">
           <input id="send-button" value="send" type="submit">
         </div>
@@ -89,7 +85,7 @@
 <footer id="sticky-footer">
   <p>&copy;Copyright 2017 Daniel Russo</p>
 </footer>
-<script src="./assets/javascript/rps_game.js"></script>
+<script src="./assets/javascript/rps_game2.js"></script>
 
 </body>
 </html>

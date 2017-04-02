@@ -121,18 +121,26 @@ section {
 
 .player-box {
   display: block;
-  /*justify-content: space-between;*/
   height: 150px;
   width: 150px;
   border: solid 1px black;
   position: relative;
+  z-index: 1;
+}
+
+.player-box h4 {
+  align-self: center;
+  position: absolute;
   z-index: 2;
+  top: 20%;
+  left: 10%;
+  font-size: 2em;
 }
 
 .instruct {
   align-self: flex-start;
   position: absolute;
-  z-index: 4;
+  z-index: 2;
   top: 1px;
   left: 2px;
 }
@@ -140,8 +148,8 @@ section {
 .score {
   align-self: flex-end;
   position: absolute;
+  z-index: 2;
   left: 2px;
-  z-index: 4;
   bottom: 1px;
 }
 
@@ -175,24 +183,13 @@ section {
   box-shadow: 0 0 15px 7px yellow;
 }
 
-.reg-box {
-  z-index: 1;
+.under-box {
   display: block;
-  /*justify-content: space-between;*/
   height: 150px;
   width: 150px;
   border: solid 1px black;
-  position: relative;
-}
-
-.cover-box {
-  display: block;
-  /*justify-content: space-between;*/
-  height: 150px;
-  width: 150px;
-  border: solid 1px black;
-  position: relative;
-  z-index: 20;
+  position: absolute;
+  z-index: -2;
 }
 
 /* -----FIXED COMPONENTS----- */

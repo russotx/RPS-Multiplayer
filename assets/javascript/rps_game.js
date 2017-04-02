@@ -21,6 +21,8 @@
 *
 ****************************************/
 
+
+
   // the database
   var database = firebase.database();
 
@@ -315,8 +317,13 @@ function getName(event) {
 function drawGlowBoxfunc(playerFlag) {
     console.log('drawing glow box');
     var glowBox= $('<div>');
+    glowBox.attr('id','glow-box');
     glowBox.addClass('player-box yellow-border cover-box');
     $('#player'+playerFlag).append(glowBox);
+}
+
+function removeGlowBox(playerFlag) {
+  $('#player'+playerFlag).find('#glow-box').remove();
 }
 
 // update the scoreboard for a player
@@ -389,12 +396,13 @@ function compareChoicesFunc(p1Choice,p2Choice){
     }
 }
 
-function getChatMessage(){
+function getChatMessage(event){
   console.log('getting a chat message');
   event.preventDefault();
-  var chat = $('#send-button').val().trim();
+  var chat = $('#chat-form').val().trim();
   $('#chat-form').val("");
   console.log("just entered chat: "+chat);
+  return chat;
 }
 
 // initialize the variables to match the game state in the DB
@@ -461,10 +469,11 @@ function RPSengine () {
           }
         database.ref().update({turn: theTurn});
       });
-      var theTurnRef = database.ref('turn/');
+
 
       // update the RPS boxes everytime the turn changes in the DB
-      theTurnRef.on('value',function(spapple){
+      var theTurnRef = database.ref('turn/');
+      theTurnRef.on('value',function(snapple){
         // if it's not the client's turn, make the boxes unclickable
         theTurn = snapple.val();
         if ((clientPlayerNum != theTurn) || (clientIsPlayer === false)){
@@ -477,14 +486,110 @@ function RPSengine () {
         drawGlowBoxfunc(theTurn);
         drawRPSfunc(theTurn);
       });
- //   } else
- //     {
-        if (clientIsPlayer === false) {
-          database.ref().on('value',function(snapshot){
-            dataPull = snapshot.val();
-            $('#player1-pick').html(dataPull[1].choice);
-            $('#player2-pick').html(dataPull[2].choice);
-        });
+
+
+      /*****************
+        ASYNC APPROACH
+      *****************/
+
+
+
+      /*----------------
+       ALL CLIENTS VIEW
+       -----------------*/
+      // update the score every time a round is over
+      var endRoundRef = database.ref('winner/');
+      endRoundRef.on('value',function(score) {
+        drawRPSfunc(1);
+      });
+
+      var player1NameRef = database.ref('/players/1/name/')
+      playerNameRef.on('value',function(names) {
+        $('#player1-instruct').html(p1.name);
+      }
+      var player2NameRef = database.ref('/players/2/name/')
+      playerNameRef.on('value',function(names) {
+        $('#player1-instruct').html(p1.name);
+      }
+
+
+
+      var theView = {
+        player1name : "",
+        player2name : "",
+        player1wins : 0,
+        player2wins : 0,
+        player1pick : "",
+        player2pick : "",
+        roundResult : "",
+        gameFeed : "",
+        rpsButton : "",
+        lastChat : "",
+        chatButton : "",
+        loginWindow : "",
+        loginButton : "",
+        theTurn : 0
+      }
+
+      function updateDOM(key,value) {
+        switch(key) {
+          case ("p1name") :
+            //update p1name
+           break;
+          case ("p2name") :
+            //update p2name
+           break;
+          case ("winner") :
+            //update winner message
+            break;
+          case ("chat") :
+            //add chat message
+            break;
+          case ("score1") :
+            //update p1 score
+            break;
+          case ("score2") :
+            //update p2 score
+            break;
+
+        }
+      }
+
+      // All clients receive these updates to the DOM from the DB
+      database.ref().on('value',function(theDB){
+        theStorage = theDB.val();
+
+        if (player1name != theStorage.p1Name) {
+          theView.player1name = theStorage.p1Name;
+          updateDOM("p1name",theView.player2name);
+        }
+        if (player2name != theStorage.p2Name) {
+          theView.player2name = theStorage.p2Name;
+          updateDOM("p2name",theView.player2name);
+        }
+
+        if (theView.roundResult != theStorage.winnerMsg) {
+          theView.roundResult = theStorage.winnerMsg;
+          updateDOM("winner",theView.winnerMsg);
+        }
+
+        if (theView.lastChat != theStorage.chat) {
+          theView.lastChat = theStorage.chat;
+          updateDOM("chat",theView.lastChat);
+        }
+
+        if (theView.player1wins != theStorage.p1Wins) {
+          theView.player1wins = theStorage.p1Wins;
+          updateDOM("score1",theView.player1wins);
+        }
+
+        if (theView.player2wins != theStorage.p2Wins) {
+          theView.player2wins = theStorage.p2Wins;
+          updateDOMscore("score2",theView.player2wins);
+        }
+
+      });
+
       }
     }
   }

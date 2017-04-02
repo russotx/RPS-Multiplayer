@@ -153,6 +153,10 @@ section {
   bottom: 1px;
 }
 
+.score p {
+  display: inline;
+}
+
 .container-center{
   margin: 5px auto 5px auto;
   align-items: center;
@@ -240,6 +244,7 @@ section {
   position: relative;
   background-color: white;
   border: none;
+  font-size: .6em;
 }
 
 #chat-form {

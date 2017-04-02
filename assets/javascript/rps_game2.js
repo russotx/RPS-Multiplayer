@@ -136,7 +136,8 @@
         $('#chat-form-container').on('click','#send-button',function(){
           event.preventDefault();
           var newChat = getChatMessage();
-          database.ref('/allClients/chat/').update(newChat);
+          var name = theView['p'+clientPlayerNum+'Name'];
+          database.ref('/allClients/').update({ chat : name+': '+newChat });
         });
 
       } //---- end of asyncUpdateDB()
@@ -145,6 +146,9 @@
       //--------------- DB HELPER FUNCTIONS -----------------
 
       function assignPlayerNum(name) {
+        var newTurn = 3;
+        // initialize fan out with update to turn at root because new player joined
+        var fanoutObject3 = { turn : newTurn };
         console.log('just passed : '+name+' : to assignPlayerNum');
         database.ref().once('value')
           .then(function(snapshot) {
@@ -176,12 +180,12 @@
                 clientPlayerNum = 1;
                 // not enough players to start the game
                 newTurn = 3;
+                // clear chat because nobody is playing
+                fanoutObject3['/allClients/chat/'] = "";
               }
               console.log("CLIENT IS PLAYER NUMBER "+clientPlayerNum);
             // onDisconnect should always be assigned before any writes to the DB
             dropPlayerOnDisconnect(theDB);
-            // initialize fan out with update to turn at root because new player joined
-            var fanoutObject3 = { turn : newTurn };
             // update the client's entered name in the DB
             fanoutObject3['/allClients/p'+clientPlayerNum+'Name/'] = name;
             fanoutObject3['/players/'+clientPlayerNum+'/name/'] = name;
@@ -201,8 +205,8 @@
         fanoutObject['/allClients/p'+clientPlayerNum+'Pick/'] = "";
         fanoutObject['/allClients/score'+clientPlayerNum+'/'] = 0;
         fanoutObject['/allClients/losses'+clientPlayerNum+'/'] = 0;
+        fanoutObject['/allClients/chat/'] = "";
         fanoutObject['/allClients/turn/'] = 3;
-      //  fanoutObject['/allClients/winner/'] = "";
         fanoutObject['/turn/'] = 3;
         presenceRef.onDisconnect().remove();
         database.ref().onDisconnect().update(fanoutObject);
@@ -326,15 +330,15 @@
             break; */
           case ("chat") :
             //add chat message
-            $('#chat-window').append(value);
+            $('#chat-window').append('<p>'+value+'</p>');
             break;
           case ("score1") :
             //update p1 score
-            $('#player1-score').text('Wins: '+value);
+            $('#player1-score').text('Wins: '+value+' ');
             break;
           case ("score2") :
             //update p2 score
-            $('#player2-score').text('Wins: '+value);
+            $('#player2-score').text('Wins: '+value+' ');
             break;
           case ("losses1") :
             //update p1 score
@@ -451,7 +455,9 @@
             removeGlowBox();
             $('#results').html("");
             $('#game-feed').html("");
-            $('#chat').html("");
+            //$('#chat-form-container').html("");
+            //$('#chat-form-container').find('#chat-form').remove();
+            //$('#chat-form-container').find('#send-button').remove();
             console.log('newTurnDOMops case 3');
             drawStartButton();
           break;

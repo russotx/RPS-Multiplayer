@@ -94,7 +94,7 @@
         // --------------- CHAT BUTTON -------------------
         // click event listener for the chat box
         // when client clicks a CHAT BUTTON, these things happen
-        $('#chat-form-container').on('click','#send-button',function(){
+        $('#chat-form-container').on('click','#send-button',function(event){
           event.preventDefault();
           var newChat = getChatMessage();
           var name = theView['p'+clientPlayerNum+'Name'];

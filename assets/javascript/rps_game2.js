@@ -17,45 +17,11 @@
 
   // the database
   var database = firebase.database();
-  // reference to top level of database
-  var dbTopRef = database.ref();
-  // reference to allClients
-  var dbAllClients = database.ref('/allClients/');
-
 
   /*---- FLAGS ----*/
 
-  // Is turn 1 or turn 2?
-  var theTurn = 1;
-  // has a game started?
-  var isGameStarted = false;
-  // is this the beginning of a new round?
-  var isFreshRound = false;
-  // are there two players logged in?
-  var isTwoPlayers = false;
-  // is the client a spectator - does not get to interact
-  var isSpectator = true;
-  // are the login buttons drawn?
-  var loginPrepped = false;
-  // is there a player1
-  var isaPlayer1 = false;
-  // is there a player 2
-  var isaPlayer2 = false;
-  // are there no players logged in
-  var noPlayers = false;
-  // is the client playing in the game?
-  var clientIsPlayer = false;
   // which player is the client
   var clientPlayerNum = 0;
-  // which player is the opponent
-  var otherPlayerNum = 0;
-  // the name client entered
-  // var clientPlayerName = "";
-
-  // testing for initial auto read of db on page load
-  var initialRead = true;
-  var promptClientChoice = "It's Your Turn!";
-  var gameFeed = "";
 
  var theView = {
       p1Name : "Waiting for Player 1",
@@ -66,8 +32,6 @@
       losses2 : 0,
       p1Pick : "",
       p2Pick : "",
-      //winner : "",
-      gameFeed : "",
       rpsButton : "",
       chat : "",
       chatButton : "",
@@ -101,8 +65,6 @@
         // if it's not client's turn, there are no buttons
         // when client clicks an RPS BUTTON, these things happen
         $('#rps-action').on('click','.rps-button',function(event){
-            //event.preventDefault();
-            console.log('client just clicked an RPS button');
             var choice = getChoice(event);
             var fanoutObject1 = {};
             fanoutObject1['/allClients/p'+clientPlayerNum+'Pick/'] = choice;
@@ -113,7 +75,7 @@
             // IS SUPPOSED TO UPDATE THE TURN
             // update the turn in the database because player just made pick
             if (nextTurn != 1) {
-              var fanoutObject2 = {};
+              var fanoutObject2 = { turn: nextTurn };
               fanoutObject2['/allClients/turn/'] = nextTurn;
               database.ref().update(fanoutObject2);
             }
@@ -126,7 +88,6 @@
         $('#login-container').on('click','#start-button',function(event){
           event.preventDefault();
           var clientPlayerName = getName(event);
-          console.log("client just entered "+clientPlayerName+" as their name");
           assignPlayerNum(clientPlayerName);
         });
 
@@ -146,29 +107,28 @@
       //--------------- DB HELPER FUNCTIONS -----------------
 
       function assignPlayerNum(name) {
+        // start newTurn at 3, could be first player that joined and game not ready
+        // to start turn 1
         var newTurn = 3;
-        // initialize fan out with update to turn at root because new player joined
-        var fanoutObject3 = { turn : newTurn };
-        console.log('just passed : '+name+' : to assignPlayerNum');
+        // get a snapshot of the DB only one time and wait until snap obtained before
+        // proceeding with function
         database.ref().once('value')
           .then(function(snapshot) {
             var theDB = snapshot.val();
             // if theDB/players/ exists then there's at least 1 existing player
             if (theDB.players != undefined){
+              // adding another player will make it 2 players and it'll be turn 1
+              newTurn = 1;
               switch (undefined) {
                 // player 1 doesn't exist
                 case (theDB.players[1]) :
                   // client takes the player 1 spot
                   clientPlayerNum = 1;
-                  // now have player 1 and player 2, it's player 1's turn
-                  newTurn = 1;
                   break;
                 // player 2 doesn't exist
                 case (theDB.players[2]) :
                   // client takes the player 2 spot
                   clientPlayerNum = 2;
-                  // now have player 1 and player 2, it's player 1's turn
-                  newTurn = 1;
                   break;
                   // neither players[1] or players[2] showed undefined
                   default : console.log("there was a problem with assignPlayerNum, the DB /players/ has a p1 and p1");
@@ -180,12 +140,13 @@
                 clientPlayerNum = 1;
                 // not enough players to start the game
                 newTurn = 3;
-                // clear chat because nobody is playing
-                fanoutObject3['/allClients/chat/'] = "";
               }
-              console.log("CLIENT IS PLAYER NUMBER "+clientPlayerNum);
             // onDisconnect should always be assigned before any writes to the DB
             dropPlayerOnDisconnect(theDB);
+            // initialize fanout with update to turn at root because new player joined
+            var fanoutObject3 = { turn : newTurn };
+            // clear chat because a new player joined
+            fanoutObject3['/allClients/chat/'] = "";
             // update the client's entered name in the DB
             fanoutObject3['/allClients/p'+clientPlayerNum+'Name/'] = name;
             fanoutObject3['/players/'+clientPlayerNum+'/name/'] = name;
@@ -197,37 +158,22 @@
       }
 
       function dropPlayerOnDisconnect() {
-        console.log('watching for disconnect to drop player');
-        console.log('/players/'+clientPlayerNum+'/');
         var presenceRef = database.ref('/players/'+clientPlayerNum+'/');
-        var fanoutObject = {};
+        var fanoutObject = { turn : 3 };
         fanoutObject['/allClients/p'+clientPlayerNum+'Name/'] = "Waiting for Player "+clientPlayerNum;
         fanoutObject['/allClients/p'+clientPlayerNum+'Pick/'] = "";
         fanoutObject['/allClients/score'+clientPlayerNum+'/'] = 0;
         fanoutObject['/allClients/losses'+clientPlayerNum+'/'] = 0;
         fanoutObject['/allClients/chat/'] = "";
         fanoutObject['/allClients/turn/'] = 3;
-        fanoutObject['/turn/'] = 3;
         presenceRef.onDisconnect().remove();
         database.ref().onDisconnect().update(fanoutObject);
       }
 
-
-
-      function getOtherPlayerNum(){
-        if (clientPlayerNum === 1) {
-          return 2;
-        } else {
-            return 1;
-          }
-      }
-
       // retrieve the player's choice
       function getChoice(event) {
-        console.log('getting the player choice');
         var target = $(event.target);
         var choice = target.text();
-        console.log("just picked: "+choice);
         return choice;
       }
 
@@ -246,11 +192,9 @@
 
       // retrieve the login name
       function getName(event) {
-        console.log('retrieving login name');
         if ($('#login-box').val() != undefined) {
           var name = $('#login-box').val().trim();
           // empty the login box
-          console.log("just entered username: "+name);
           return name;
         } else {
             return false;
@@ -258,10 +202,8 @@
       }
 
       function getChatMessage(){
-        console.log('getting a chat message');
         var chat = $('#chat-form').val().trim();
         $('#chat-form').val("");
-        console.log("just entered chat: "+chat);
         return chat;
       }
 
@@ -308,7 +250,7 @@
             // if name just updated, client could have been the
             // one that entered a name.
             // and add the chat box for the player
-            if (playerNum != 0) {
+            if (playerNum === 1) {
               drawChatButton();
               $('#game-feed').html('<p>Hi '+value+'! You are Player '+playerNum+'</p>');
               $('#login-container').find('#login-box').remove();
@@ -322,7 +264,7 @@
             // if name just updated, client could have been the
             // one that entered a name
             // and add teh chat box for the player
-            if (playerNum != 0) {
+            if (playerNum === 2) {
               drawChatButton();
               $('#game-feed').html('<p>Hi '+value+'! You are Player '+playerNum+'</p>');
               $('#login-container').find('#login-box').remove();
@@ -354,8 +296,8 @@
             removeRPS(2);
             //show player 2 pick
             $('#player2-pick').html(value);
-            // don't want to compare choices if it's blank
             if (value != "") {
+            // don't want to compare choices if it's blank
               compareChoicesFunc();
             }
             break;
@@ -365,9 +307,6 @@
           // player 1, player 2, or player 0/spectator
           case ("p1Pick") :
             setPickDisplay(key,value,playerNum);
-            break;
-          case ("gameFeed") :
-            setGameFeed(key,value,playerNum);
             break;
           case ("turn") :
             // turn values are 1 2 or 3(not enough players)
@@ -384,17 +323,10 @@
             var name2 = theDB.allClients.p2Name;
             var p1score = theDB.allClients.score1;
             var p1loss = theDB.allClients.losses1;
-            console.log("score1 is... ");
-            console.log(theDB.allClients.score1);
             var p2score = theDB.allClients.score2;
             var p2loss = theDB.allClients.losses2;
-            console.log("score2 is... ");
-            console.log(theDB.allClients.score2);
             var p1Choice = theDB.allClients.p1Pick;
             var p2Choice = theDB.allClients.p2Pick;
-            console.log("p1 choice is: "+p1Choice);
-            console.log("p2 choice is: "+p2Choice);
-            console.log('comparing player choices');
 
             var choices = ["Rock","Paper","Scissors","Rock"];
             var p1choiceIndex = choices.indexOf(p1Choice);
@@ -416,7 +348,6 @@
                 fanoutObject1['/players/2/choice/'] = "";
                 fanoutObject1['/allClients/p2Pick/'] = "";
                 database.ref().update(fanoutObject1);
-                // do I need to update theView.allClients.score2 here?
               }
               else {
                 $('#results').html("<h1>"+name1+" Wins!</h1>");
@@ -431,12 +362,10 @@
                 fanoutObject1['/players/2/choice/'] = "";
                 fanoutObject1['/allClients/p2Pick/'] = "";
                 database.ref().update(fanoutObject1);
-                // do I need to update theView.allClients.score1 here?
               }
               setTimeout(function(){
                            var fanoutObject2 = { turn : 1 };
                            fanoutObject2['/allClients/turn/'] = 1;
-                           console.log("updating the DB turn after compare");
                            database.ref().update(fanoutObject2);
                          }, 4000);
               // end of setTimeout
@@ -444,7 +373,6 @@
       }
 
       function newTurnDOMops(key,turnNum,playerNum) {
-        console.log("the turn has changed in the DB");
         $('#game-feed').find('.instruction').remove();
         switch (turnNum) {
           // turn is 3 when two players haven't joined or someone drops
@@ -455,7 +383,7 @@
             removeRPS(2);
             removeGlowBox();
             $('#results').html("");
-            $('#game-feed').html("");
+            $('#game-feed').find('.instruction').remove();
             $('#chat-window').html("");
             // only remove the chat button if the client isn't a player
             if (clientPlayerNum === 0) {
@@ -463,9 +391,6 @@
               //remove the game feed too
               $('#game-feed').html("");
             }
-            //$('#chat-form-container').find('#chat-form').remove();
-            //$('#chat-form-container').find('#send-button').remove();
-            console.log('newTurnDOMops case 3');
             // only draw the start button if the client isn't a player
             if (clientPlayerNum === 0){
               drawStartButton();
@@ -488,6 +413,7 @@
             // draw the RPS buttons in the client's box
             // if the client is a player and its client's turn
             setRPSbuttonsDisplay(playerNum);
+            break;
           // turn is 2
           default :
             // if the turn isn't 3 the game has enough players to start
@@ -510,7 +436,6 @@
 
       // draw the start button and login box
       function drawStartButton() {
-        console.log('drawing the start button');
         var newBox = $('<input>');
         newBox.attr('id','login-box');
         var newStart = $('<input>');
@@ -518,7 +443,6 @@
         newStart.attr('id','start-button');
         $('#login-container').html(newBox);
         $('#login-container').append(newStart);
-        loginPrepped = true;
       }
 
       function drawChatButton() {
@@ -538,7 +462,6 @@
 
       // build the glowing border around active player box
       function drawGlowBoxfunc(playerFlag) {
-          console.log('drawing glow box');
           var glowBox= $('<div>');
           glowBox.attr('id','glow-box');
           glowBox.addClass('player-box yellow-border under-box');
@@ -556,7 +479,6 @@
 
       // build the rock paper scissors choice buttons and put them in an array
       function drawRPSfunc(playerFlag) {
-          console.log('drawing the RPS buttons for player'+playerFlag);
           var buttonR= $('<button>');
           var buttonP= $('<button>');
           var buttonS= $('<button>');
@@ -582,23 +504,6 @@
         $('#player'+playerFlag).find('.rps-button').remove();
       }
 
-      // displays game instruction for players
-      // displays nothing for spectators
-      function setGameFeed(key,value,playerNum) {
-        switch(playerNum) {
-          // client is playing and it's client's turn
-          case (theView.turn) :
-            $('#player'+playerNum+'-instruct').html("It's Your Turn!");
-            break;
-          // client isn't playing, nothing is displayed
-          case (0) :
-            $('#player1-instruct').html("");
-            break;
-          default :
-          // client is playing but it's not client's turn
-            $('#player'+playerNum+'-instruct').html("Waiting for other player");
-        }
-      }
 
       function setRPSbuttonsDisplay(clientPlayerNum) {
         switch (clientPlayerNum) {

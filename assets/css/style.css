@@ -15,7 +15,7 @@ body {
   display: flex;
   flex-direction: column;
   margin-left: -10px;
-  background-color: #8DA2FF;
+  background-color: #ffffee;
 }
 
 /* -----ELEMENT CSS----- */
@@ -31,8 +31,10 @@ header {
   margin: 0 0 10px 0;
   width: 100%;
   height: 60px;
-  background-color: #0B00D5;
+  background-color: black;
   color: white;
+  font-family: 'Cinzel', serif;
+
 }
 
 aside {
@@ -40,6 +42,13 @@ aside {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+aside h3 {
+  color: black;
+  font-weight: 600;
+  font-family: 'Exo', sans-serif;
+
 }
 
 section {
@@ -123,9 +132,11 @@ section {
   display: block;
   height: 150px;
   width: 150px;
-  border: solid 1px black;
   position: relative;
   z-index: 1;
+  background-color: #acc5c3;
+  box-shadow: -1px 2px 8px #303300;
+  font-family: 'Quattrocento', serif;
 }
 
 .player-box h4 {
@@ -167,8 +178,8 @@ section {
 .rps-button {
   height: 50px;
   width: 150px;
-  background-color: #3E9AEE;
-  border: solid 1px black;
+  background-color: #844c2a;
+  border: solid 1px #521f00;
   text-align: center;
   z-index: 8;
   position: relative;
@@ -176,15 +187,16 @@ section {
   color: white;
   font-size: 1em;
   font-weight: 600;
+  font-family: 'Cinzel';
 }
 
 .rps-button:hover {
-  border: solid 3px white;
+  border: solid 3px rgba(35, 35, 35, 0.48);
 }
 
 .yellow-border {
   background-color: rgba(0,0,0,0);
-  box-shadow: 0 0 15px 7px yellow;
+  box-shadow: 0 0 15px 7px #2b2b29;
 }
 
 .under-box {
@@ -198,6 +210,16 @@ section {
 
 /* -----FIXED COMPONENTS----- */
 
+#chat-frame {
+    background-color: #d4cebe;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0 30px 0;
+    border-radius: 15px;
+    box-shadow: -1px 2px 5px #37342D;
+}
 
 #app-board {
   height: 100%;
@@ -214,16 +236,18 @@ section {
   font-size: 1em;
   width: 75%;
   align-self: center;
+  font-family: 'Quattrocento', serif;
 }
 
 #start-button {
-  height: 35px;
+  height: 33px;
   width: 20%;
   background-color: white;
-  border: solid 1px black;
+  border: solid 1px white;
   font-size: .8em;
   align-self: center;
-
+  border-radius: 5px;
+  box-shadow: -1px 0.5px 3px #2e3100;
 }
 
 #game-feed {
@@ -232,6 +256,18 @@ section {
   align-items: center;
   text-align: center;
   height: 70px;
+  font-weight: 600;
+  color: black;
+  font-family: 'Quattrocento', serif;
+
+}
+
+#results {
+  box-shadow: inset 0 0 16px #373737;
+  background-color: white;
+  border: solid 4px #6b350d;
+  border-radius: 3px;
+  width: 200px;
 }
 
 #rps-action {
@@ -240,12 +276,19 @@ section {
 }
 
 #chat-window {
-  height: 150px;
-  overflow: scroll;
-  position: relative;
-  background-color: white;
-  border: none;
-  font-size: .6em;
+    height: 150px;
+    overflow-y: scroll;
+    position: relative;
+    background-color: black;
+    padding-left: 10px;
+    border: none;
+    font-size: .8em;
+    display: block;
+    color: #32ff3b;
+    box-shadow: inset 0 0 20px #929292;
+    border-radius: 5px;
+    font-family: 'Orbitron';
+
 }
 
 #chat-form {
@@ -253,6 +296,7 @@ section {
   background-color: white;
   border: solid 1px black;
   width: 75%;
+  font-family: 'Orbitron';
 }
 
 #send-button {
@@ -260,8 +304,12 @@ section {
   width: 20%;
   color: black;
   font-size: .8em;
-  border: solid 1px black;
-  background-color: white;
+  border: solid 0px #2e3100;
+  background-color: #d4cebe;
+  margin-left: 5px;
+  margin-top: 5px;
+  border-radius: 5px;
+  box-shadow: -1px 0.5px 3px #2e3100;
 }
 
 #player1-pick,
@@ -272,89 +320,22 @@ section {
   align-self: center;
 }
 
-/*
-#app-title {
-  z-index: 5;
-  overflow: hidden;
-  padding: 0;
-  background-color: black;
-  margin: 0;
-  width: 100%;
-  height: 25vh;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 2px 5px 5px rgba(26, 26, 26, 0.42);
-}
-*/
 
-/*
-.overlay {
-  width: 100%;
-  height: inherit;
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  z-index: 4;
-  background-color: green;
-  padding: 0;
-  margin: 0;
-  border: none;
-  overflow: hidden;
-}
-
-.overlay img{
-  width: 100%;
-  height: inherit;
-  object-fit: cover;
-  object-position: 50% 20%;
-  z-index: 4;
-  background-color: green;
-  padding: 0;
-  margin: 0;
-  border: 0;
-}
-
-#title-box {
-  text-align: center;
-  color: white;
-  margin: 0;
-  position: absolute;
-  padding-top: 10px;
-  padding-bottom: 5px;
-  z-index: 5;
-  top: 50%;
-  left: 50%;
-  background-color: rgba(0,0,0,.5);
-  transform: translate(-50%,-50%);
-  border-radius: 5px;
-  font-size: 2em;
-}
-
-#title-box h1 {
-  font-size: 1.5em;
-}
-
-
-#title-box h5 {
-  font-size: .7em;
-}
-*/
 
 
 #sticky-footer {
-  color:#fff;
-  background-color:#894021;
+  color: white;
+  background-color: black;
   background-size: cover;
   border-top: 6px solid #4A2A09;
   width: 100%;
-  height: 30px;
+  height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: auto;
   text-align: center;
+  font-family: 'Quattrocento', serif;
 }
 
 #sticky-footer p {
@@ -362,30 +343,6 @@ section {
   align-self: center;
 }
 /* --- dynamic content --- */
-
-
-
-/* --- responsive ------ */
-
-/*
-@media screen and (max-width: 414px) {
-
-  #title-box {
-    width:  100%;
-   }
-
-  #gif-display {
-    width: 100%;
-  }
-
-  form {
-    line-height: 1.5;
-  }
-
-}
-
-
-*/
 
 
 

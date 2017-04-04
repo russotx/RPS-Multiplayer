@@ -11,6 +11,7 @@
   <link rel="stylesheet" type="text/css" href="./assets/css/reset.css">
   <!-- custom stylesheet -->
   <link rel="stylesheet" type="text/css" href="./assets/css/style.css">
+  <link href="https://fonts.googleapis.com/css?family=Cinzel|Exo:700|Orbitron|Quattrocento|Revalia|Space+Mono|Titillium+Web:600,700" rel="stylesheet">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
 
@@ -29,15 +30,14 @@
       <div class="row">
         <div id='login-container' class='col-2 container-center'>
           <!-- login box and start button for user to join game -->
-          <input id="login-box">
-          <input id="start-button" type="submit">
+          <input id="login-box" placeholder="Enter your name to play">
+          <input id="start-button" type="submit" value="Login">
         </div>
       </div>
       <!-- section for game play text messages to users -->
       <div class="row">
         <article id='game-feed' class="col-5 container-center">
-          <h4>When a player position is available,</h4>
-          <h4>enter your name in the form and click submit.</h4>
+          <h4>Login to play when a spot is open.</h4>
         </article>
       </div>
 
@@ -70,8 +70,11 @@
       </section>
 
       <!-- chat view window -->
-      <aside class="row">
-        <div id="chat-window" class="col-4">
+      <aside>
+        <div id='chat-frame' class='col-4'>
+          <h3>Player Smack Board</h3>
+          <div id="chat-window" class="col-5">
+          </div>
         </div>
       </aside>
       <!-- chat submit form & send button -->
